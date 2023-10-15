@@ -1,0 +1,17 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },  
+    "include": [
+        "src/routes/+page.svelte"
+        ],
+    "extends": "standard-with-typescript",
+    "parserOptions": {
+        "project": "./tsconfig.json",
+        "extraFileExtensions": [".svelte"]
+      },
+    "rules": {
+    }
+}
