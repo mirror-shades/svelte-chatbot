@@ -1,8 +1,11 @@
 module.exports = {
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
-    container: {
-      padding: '2rem',
+    extend: {
+      fontFamily: {
+        logo: ['League Spartan'],
+        writing: ['Montserrat']
+      }
     },
   },
   daisyui: {

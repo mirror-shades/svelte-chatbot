@@ -109,6 +109,19 @@
   };
 </script>
 
+<div>
+  <p
+    class="font-logo font-bold text-[110px] tracking-[-8px] mt-[-20] mb-[-55px]"
+  >
+    {#if mode === "coding"}
+      Mimesis.Code
+    {:else}
+      Mimesis.
+    {/if}
+  </p>
+  <p class="font-writing text-[20px] tracking-[20px] mb-12">chatbot</p>
+</div>
+
 <!--GPT model select-->
 <label>
   <select class="bg-base-100" bind:value={model}>
@@ -128,17 +141,14 @@
       handlePromptChange();
     }}
   >
-    <option value="">No prompt</option>
-    <option value="coding">Coding</option>
+    <option value="">Mimesis</option>
+    <option value="coding">Mimesis Code</option>
     <option value="custom">Custom</option>
   </select>
 </label>
-{#if mode === "coding"}
-  <p>This is an experimental coding assistant</p>
-{/if}
 {#if mode === "custom"}
   <div>
-    <input placeholder="Customize your chatbot" bind:value={prompt} />
+    <textarea placeholder="Leave empty to use no prompt" bind:value={prompt} />
   </div>
 {/if}
 

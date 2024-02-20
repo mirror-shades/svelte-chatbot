@@ -13,14 +13,14 @@
       <button
         class={chatbot ? "btn btn-secondary" : "btn btn-secondary btn-outline"}
         on:click={() => (chatbot = true)}
-        >Chatbot
+        >Chat
       </button>
       <div style="width:15px" />
       <button
         class={!chatbot ? "btn btn-secondary" : "btn btn-secondary btn-outline"}
         on:click={() => (chatbot = false)}
       >
-        ImageBot
+        Images
       </button>
     </div>
     <div class="relative">
@@ -33,8 +33,8 @@
 </div>
 
 <!--Body-->
-<div class="grid z-1 h-screen place-items-center">
-  <div class="card highlight w-1/2 bg-base-100 shadow-xl">
+<div class="grid z-1 pt-6 h-screen place-items-center">
+  <div class="card highlight w-3/5 bg-base-100 shadow-xl">
     <div class="card-body items-center text-center">
       {#if chatbot}
         <ChatBot />
