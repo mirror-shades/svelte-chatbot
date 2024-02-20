@@ -77,6 +77,17 @@
   };
 </script>
 
+<div>
+  <p
+    class="font-logo font-bold text-[110px] tracking-[-8px] mt-[-20px] mb-[-55px]"
+  >
+    Mimesis.Image
+  </p>
+  <p class="font-writing text-[20px] tracking-[20px] mb-12 mr-8">
+    image generator
+  </p>
+</div>
+
 <select
   class="bg-base-100"
   bind:value={model}
