@@ -45,9 +45,9 @@
         _input +
         "</div><div class='text-[11px] italic'>(Completion time: " +
         completionTime +
-        "; Tokens: " +
+        "; i:" +
         input.usage.prompt_tokens +
-        "+" +
+        " o:" +
         input.usage.completion_tokens +
         "; Model: " +
         input.model +
@@ -62,6 +62,18 @@
       );
     }
   }
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const textarea = e.target as HTMLTextAreaElement; // Type assertion
+    if (!textarea) return;
+    e.preventDefault();
+    const startPosition = textarea.selectionStart;
+    const endPosition = textarea.selectionEnd;
+    input = input.slice(0, startPosition) + "\n" + input.slice(endPosition);
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = startPosition + 1;
+    }, 0);
+  };
 
   const handleMessage = async () => {
     if (chatLock === false && input != "") {
@@ -167,13 +179,7 @@
       e.preventDefault();
       input += "\n";
     } else if (e.shiftKey && e.key === "Enter") {
-      e.preventDefault();
-      const startPosition = e.target.selectionStart;
-      const endPosition = e.target.selectionEnd;
-      input = input.slice(0, startPosition) + "\n" + input.slice(endPosition);
-      setTimeout(() => {
-        e.target.selectionStart = e.target.selectionEnd = startPosition + 1;
-      }, 0);
+      handleKeyDown(e);
     } else if (e.key === "Enter") {
       e.preventDefault();
       handleMessage();
