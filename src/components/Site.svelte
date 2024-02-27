@@ -2,6 +2,7 @@
   import ThemeSwitch from "./ThemeSwitch.svelte";
   import ChatBot from "./Chatbot.svelte";
   import ImageGen from "./Imagegen.svelte";
+  import GithubLink from "./GithubLink.svelte";
   let chatbot = true;
 </script>
 
@@ -25,7 +26,15 @@
     </div>
     <div class="relative">
       <div class="absolute pl-24">
-        <ThemeSwitch />
+        <div class="flex w-full">
+          <div class="grid h-20 flex-growrounded-box place-items-center">
+            <ThemeSwitch />
+          </div>
+
+          <div class="grid h-20 flex-grow rounded-box ml-8 place-items-center">
+            <GithubLink />
+          </div>
+        </div>
       </div>
     </div>
     <div class="navbar-end" />

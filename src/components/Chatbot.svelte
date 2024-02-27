@@ -114,9 +114,11 @@
     class="font-logo font-bold text-[110px] tracking-[-8px] mt-[-20] mb-[-55px]"
   >
     {#if mode === "coding"}
-      Mimesis.Code
-    {:else}
+      Mimesis.code
+    {:else if mode === "custom"}
       Mimesis.
+    {:else}
+      Mimesis.dev
     {/if}
   </p>
   <p class="font-writing text-[20px] tracking-[20px] mb-12">chatbot</p>
