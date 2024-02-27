@@ -1,5 +1,7 @@
 # chatbot
 
+remake of an older react project which can be found at https://github.com/mirror-shades/react-chatbot
+
 chatbot built with Svelte/Tailwind/DaisyUI
 
 to build the app: 
