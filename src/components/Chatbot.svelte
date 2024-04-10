@@ -11,7 +11,7 @@
   let chatLog = "";
   let chatLock = false;
   let input: string = "";
-  let model = "gpt-4-0125-preview";
+  let model = "gpt-4-turbo";
   let prompt: string = "";
   let mode = "";
   let chatHistory = "";
@@ -139,7 +139,7 @@
 <!--GPT model select-->
 <label>
   <select class="bg-base-100" bind:value={model}>
-    <option value="gpt-4-0125-preview">GPT-4 Turbo</option>
+    <option value="gpt-4-turbo">GPT-4 Turbo</option>
     <option value="gpt-4">GPT-4</option>
     <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
   </select>
