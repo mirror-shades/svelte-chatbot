@@ -12,8 +12,9 @@
   let chatLock = false;
   let input: string = "";
   let model = "gpt-4o";
-  let prompt: string = "";
-  let mode = "";
+  let prompt: string =
+    "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
+  let mode = "mimesis";
   let chatHistory = "";
 
   function processMessage(input: any, isBot: boolean) {
@@ -107,13 +108,13 @@
   };
 
   const handlePromptChange = () => {
+    if (mode === "mimesis") {
+      prompt =
+        "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
+    }
     if (mode === "coding") {
       prompt =
         "Your name is Mimesis and you are a coding assistant. Answer questions as succinctly as possible. Rely on code whenever possible. Assume the user has a good understanding of coding and refrain from unwarrented details if they may come off trivial or unnecessary. Keep linguistic responses as short as possible but do not be afraid to produce longform code.";
-    }
-    if (mode === "") {
-      prompt =
-        "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
     }
     if (mode === "custom") {
       prompt = "";
@@ -169,7 +170,7 @@
       handlePromptChange();
     }}
   >
-    <option value="">Mimesis</option>
+    <option value="mimesis">Mimesis</option>
     <option value="coding">Mimesis Code</option>
     <option value="custom">Custom</option>
   </select>
