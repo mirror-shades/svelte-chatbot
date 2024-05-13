@@ -11,7 +11,7 @@
   let chatLog = "";
   let chatLock = false;
   let input: string = "";
-  let model = "gpt-4-turbo";
+  let model = "gpt-4o";
   let prompt: string = "";
   let mode = "";
   let chatHistory = "";
@@ -109,36 +109,50 @@
   const handlePromptChange = () => {
     if (mode === "coding") {
       prompt =
-        "Your name is Mimesis and you are a coding assistant. Answer questions as succinctly as possible. Rely on code whenever possible. Assume the user has a good understanding of coding and refrain from unwarrented details if they may come off trivial or unnecessary.";
+        "Your name is Mimesis and you are a coding assistant. Answer questions as succinctly as possible. Rely on code whenever possible. Assume the user has a good understanding of coding and refrain from unwarrented details if they may come off trivial or unnecessary. Keep linguistic responses as short as possible but do not be afraid to produce longform code.";
     }
     if (mode === "") {
       prompt =
-        "You are a helpful chatbot named Mimesis. Try and keep chats as conversational as possible. Refrain from responding with lists unless asked.";
+        "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
     }
     if (mode === "custom") {
       prompt = "";
     }
   };
+
+  const clearChat = () => {
+    chatHistory = "";
+    chatLog = "";
+    outputTokens = 0;
+    inputTokens = 0;
+  };
 </script>
 
 <div>
-  <p
-    class="font-logo font-bold text-[110px] tracking-[-8px] mt-[-20] mb-[-55px]"
+  <button
+    on:click={() => {
+      clearChat();
+    }}
   >
-    {#if mode === "coding"}
-      Mimesis.code
-    {:else if mode === "custom"}
-      Mimesis.
-    {:else}
-      Mimesis.dev
-    {/if}
-  </p>
-  <p class="font-writing text-[20px] tracking-[20px] mb-12">chatbot</p>
+    <p
+      class="font-logo font-bold text-[110px] tracking-[-8px] mt-[-20] mb-[-55px]"
+    >
+      {#if mode === "coding"}
+        Mimesis.code
+      {:else if mode === "custom"}
+        Mimesis.
+      {:else}
+        Mimesis.dev
+      {/if}
+    </p>
+    <p class="font-writing text-[20px] tracking-[20px] mb-12">chatbot</p>
+  </button>
 </div>
 
 <!--GPT model select-->
 <label>
   <select class="bg-base-100" bind:value={model}>
+    <option value="gpt-4o">GPT-4o</option>
     <option value="gpt-4-turbo">GPT-4 Turbo</option>
     <option value="gpt-4">GPT-4</option>
     <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
