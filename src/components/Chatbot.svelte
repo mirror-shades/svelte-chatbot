@@ -15,7 +15,11 @@
   let prompt: string =
     "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
   let mode = "mimesis";
-  let chatHistory = "";
+  let chatHistory: Array<any> = [];
+
+  function addToHistory(role: string, content: string) {
+    chatHistory.push({ role, content });
+  }
 
   function processMessage(input: any, isBot: boolean) {
     let counter = 0;
@@ -38,7 +42,7 @@
       }
     });
     if (isBot) {
-      chatHistory += " " + _input;
+      addToHistory("assistant", _input);
       outputTokens += input.usage.completion_tokens;
       inputTokens += input.usage.prompt_tokens;
       return (
@@ -55,7 +59,7 @@
         ")</div></div>"
       );
     } else {
-      chatHistory += " " + _input;
+      addToHistory("user", _input);
       return (
         "<div class='chat chat-end'><div class='chat-bubble text-right'>" +
         _input +
@@ -88,10 +92,7 @@
         let startTime = Date.now();
         completion = await openai.chat.completions.create({
           model: model,
-          messages: [
-            { role: "system", content: prompt },
-            { role: "user", content: chatHistory },
-          ],
+          messages: chatHistory,
         });
         let endTime = Date.now();
         completionTime = (endTime - startTime) / 1000;
@@ -109,20 +110,29 @@
 
   const handlePromptChange = () => {
     if (mode === "mimesis") {
+      chatHistory = [];
       prompt =
         "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
+      addToHistory("system", prompt);
     }
     if (mode === "coding") {
+      chatHistory = [];
       prompt =
         "Your name is Mimesis and you are a coding assistant. Answer questions as succinctly as possible. Rely on code whenever possible. Assume the user has a good understanding of coding and refrain from unwarrented details if they may come off trivial or unnecessary. Keep linguistic responses as short as possible but do not be afraid to produce longform code.";
+      addToHistory("system", prompt);
     }
     if (mode === "custom") {
       prompt = "";
     }
   };
 
+  const handleCustomPrompt = () => {
+    chatHistory = [];
+    addToHistory("system", prompt);
+  };
+
   const clearChat = () => {
-    chatHistory = "";
+    chatHistory = [];
     chatLog = "";
     outputTokens = 0;
     inputTokens = 0;
@@ -177,7 +187,11 @@
 </label>
 {#if mode === "custom"}
   <div>
-    <textarea placeholder="Leave empty to use no prompt" bind:value={prompt} />
+    <textarea
+      placeholder="Leave empty to use no prompt"
+      bind:value={prompt}
+      on:change={handleCustomPrompt}
+    />
   </div>
 {/if}
 
