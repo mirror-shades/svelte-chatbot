@@ -5,17 +5,25 @@
   const API = import.meta.env.VITE_OPENAI_API_KEY;
   const openai = new OpenAI({ apiKey: API, dangerouslyAllowBrowser: true });
 
-  let inputTokens = 0;
-  let outputTokens = 0;
-  let completionTime = 0;
-  let chatLog = "";
-  let chatLock = false;
+  let inputTokens: number = 0;
+  let outputTokens: number = 0;
+  let completionTime: number = 0;
+  let chatLog: string = "";    
+  let voices: any = [];
+  let selectedVoice: any= null;
+  let isSupported: boolean = false;
+  let chatLock: boolean = false;
+  let speakingActive: boolean = false;
   let input: string = "";
-  let model = "gpt-4o";
+  let model: string = "gpt-4o";
   let prompt: string =
     "You are a chatbot named Mimesis. Try and come off personalable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
-  let mode = "mimesis";
+  let mode: string = "mimesis";
   let chatHistory: Array<any> = [];
+
+  if (typeof window !== "undefined") {
+    window.speechSynthesis.onvoiceschanged = getVoices;
+  }
 
   function addToHistory(role: string, content: string) {
     chatHistory.push({ role, content });
@@ -96,10 +104,11 @@
         });
         let endTime = Date.now();
         completionTime = (endTime - startTime) / 1000;
-        chatLock = false;
         chatLog += processMessage(completion, true);
+        if(speakingActive){speak(completion.choices[0].message.content)}
         console.log(completion.choices[0].message.content);
         console.log(inputTokens, outputTokens);
+        chatLock = false;
       } catch (error) {
         console.log(error);
         alert("Something went wrong");
@@ -125,6 +134,36 @@
       prompt = "";
     }
   };
+
+  function getVoices() {
+    voices = window.speechSynthesis.getVoices();
+    selectedVoice = voices.find(
+      (voice: any) => voice.name === "Google US English"
+    );
+    isSupported = !!selectedVoice;
+  }
+
+function toggleSpeaking() {
+    getVoices();
+    if (!isSupported) {
+        speakingActive = false;
+        alert("This browser is not supported");
+
+        const checkbox = document.querySelector('.checkbox') as HTMLInputElement;
+        if (checkbox) {
+            checkbox.checked = false;
+        }
+    } else {
+        speakingActive = !speakingActive;
+    }
+}
+
+  function speak(response: string) {
+    if (!response || !selectedVoice) return;
+    const utterance = new SpeechSynthesisUtterance(response);
+    utterance.voice = selectedVoice;
+    window.speechSynthesis.speak(utterance);
+  }
 
   const handleCustomPrompt = () => {
     chatHistory = [];
@@ -169,7 +208,6 @@
     <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
   </select>
 </label>
-<br />
 
 <!--GPT prompt select-->
 <label>
@@ -194,6 +232,13 @@
     />
   </div>
 {/if}
+
+<div class="form-control">
+  <label class="label cursor-pointer">
+    <span class="label-text">Speak &nbsp;</span>
+    <input type="checkbox" class="checkbox" on:change={toggleSpeaking} checked={speakingActive} />
+  </label>
+</div>
 
 <div class="h-96 p-6 w-full overflow-y-auto border p-2 rounded-lg g-c">
   <ul class="space-y-2">
