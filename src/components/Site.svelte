@@ -13,7 +13,7 @@
   <div class="navbar gap-2">
     <div class="navbar-start" />
     <div class="navbar-center">
-      <button
+      <!-- <button
         class={selected === "speech"
           ? "btn btn-secondary"
           : "btn btn-secondary btn-outline"}
@@ -21,7 +21,7 @@
       >
         Speech
       </button>
-      <div style="width:15px" />
+      <div style="width:15px" /> ** remove testing module, keeping around to implement more speach features in the future ** -->
       <button
         class={selected === "text"
           ? "btn btn-secondary"

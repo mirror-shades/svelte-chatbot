@@ -29,7 +29,6 @@
 
   function speak(response: string) {
     if (!response || !selectedVoice) return;
-
     const utterance = new SpeechSynthesisUtterance(response);
     utterance.voice = selectedVoice;
     window.speechSynthesis.speak(utterance);
