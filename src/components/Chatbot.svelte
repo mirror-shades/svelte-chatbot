@@ -5,7 +5,6 @@
   import hljs from "highlight.js";
   import "highlight.js/styles/default.css";
   import Anthropic from "@anthropic-ai/sdk";
-  import AudioPlayer from "./AudioPlayer.svelte";
 
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   const anthropic = new Anthropic({ apiKey: apiKey });
@@ -100,7 +99,7 @@
     }
   }
 
-  function markdownToHtml(markdown: string): string {
+  function markdownToHtml(markdown: string) {
     marked.setOptions({
       highlight: function (code: string, lang: string) {
         return hljs.highlightAuto(code).value;
@@ -295,7 +294,7 @@
   </label>
 </div>
 
-<div class="h-96 p-6 w-full overflow-y-auto border p-2 rounded-lg g-c">
+<div class="h-96 p-6 w-full overflow-y-auto border rounded-lg g-c">
   <ul class="space-y-2">
     {@html chatLog}
   </ul>
