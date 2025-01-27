@@ -9,8 +9,10 @@
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   const anthropic = new Anthropic({ apiKey: apiKey });
 
-  const API = import.meta.env.VITE_OPENAI_API_KEY;
-  const openai = new OpenAI({ apiKey: API, dangerouslyAllowBrowser: true });
+  const GPT_API = import.meta.env.VITE_OPENAI_API_KEY;
+  const openai = new OpenAI({ apiKey: GPT_API, dangerouslyAllowBrowser: true });
+  const DEEPSEEK_API = import.meta.env.VITE_DEEPSEEK_API_KEY;
+  const deepseek = new OpenAI({ baseURL: "https://api.deepseek.com", apiKey: DEEPSEEK_API, dangerouslyAllowBrowser: true });
 
   let inputTokens: number = 0;
   let outputTokens: number = 0;
@@ -22,12 +24,18 @@
   let chatLock: boolean = false;
   let speakingActive: boolean = false;
   let input: string = "";
-  let model: string = "gpt-4o";
+  let model: string = "deepseek-reasoner";
   let prompt: string =
     "You are a chatbot named Mimesis. Try and come off personable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
   let mode: string = "mimesis";
   let chatHistory: Array<any> = [];
   const apiEndpoint = "https://88b98r.buildship.run/response";
+
+  // Add this type definition at the top of the file
+  type DeepSeekMessage = {
+    content: string;
+    reasoning_content?: string;
+  };
 
   async function speak(prompt: string): Promise<string> {
     let audio: HTMLAudioElement | null = null;
@@ -126,23 +134,130 @@
       chatLog += processMessage(input, false);
       console.log(input);
       input = "";
-      let completion: any;
-      if (model[0] === "g") {
-        //gpt model called
+
+      if (model === "deepseek-reasoner") {
         try {
           let startTime = Date.now();
-          completion = await openai.chat.completions.create({
+          
+          console.log("Making DeepSeek API call with messages:", chatHistory);
+          const response = await deepseek.chat.completions.create({
             model: model,
             messages: chatHistory,
+            stream: false,
+            max_tokens: 1000  // Add explicit max_tokens
           });
+          console.log("Full DeepSeek response:", JSON.stringify(response, null, 2));
+
+          let endTime = Date.now();
+          completionTime = (endTime - startTime) / 1000;
+
+          // Get reasoning content and main content
+          const reasoningContent = (response.choices[0].message as DeepSeekMessage).reasoning_content;
+          const content = response.choices[0].message.content;
+          
+          console.log("Extracted reasoning:", reasoningContent);
+          console.log("Extracted content:", content);
+
+          // Display reasoning if present
+          if (reasoningContent) {
+            chatLog += `<div class='chat chat-start text-left flex flex-col space-y-0'>
+              <div class='chat-bubble bg-base-300'><strong>Reasoning:</strong> ${markdownToHtml(reasoningContent)}</div>
+            </div>`;
+          }
+          
+          // Create a completion-like object for the final content
+          const completion = {
+            choices: [{ message: { content: content } }],
+            usage: response.usage || { completion_tokens: 0, prompt_tokens: 0 },
+            model: model
+          };
+
+          chatLog += processMessage(completion, true);
+          
+          if (speakingActive && typeof content === "string") {
+            speak(content);
+          }
+          
+          chatLock = false;
+        } catch(error) {
+          console.error('DeepSeek Error:', error);
+          console.error('Error details:', {
+            name: (error as Error).name,
+            message: (error as Error).message,
+            stack: (error as Error).stack
+          });
+          alert("Something went wrong");
+          chatLock = false;
+        }
+      }
+      if(model === "deepseek-chat") {
+        try {
+          let startTime = Date.now();
+          let content = "";
+          let totalTokens = 0;
+          
+          const response = await deepseek.chat.completions.create({
+            model: model,
+            messages: chatHistory,
+            stream: false // Changed to false to get token counts
+          });
+
+          const responseContent = response.choices[0].message.content;
+          if (responseContent === null) {
+            throw new Error("No content received from API");
+          }
+          content = responseContent;
+          
+          // Create completion object with usage information
+          const completion = {
+            choices: [{ message: { content: content } }],
+            usage: response.usage,
+            model: model
+          };
+
           let endTime = Date.now();
           completionTime = (endTime - startTime) / 1000;
           chatLog += processMessage(completion, true);
           if (speakingActive) {
-            speak(completion.choices[0].message.content);
+            speak(content);
           }
-          console.log(completion.choices[0].message.content);
-          console.log(inputTokens, outputTokens);
+          chatLock = false;
+        } catch (error) {
+          console.log(error);
+          alert("Something went wrong");
+          chatLock = false;
+        }
+      }
+      if (model[0] === "g" || model[0] === "o") {
+        try {
+          let startTime = Date.now();
+          let content: string;
+          
+          const response = await openai.chat.completions.create({
+            model: model,
+            messages: chatHistory,
+            stream: false
+          });
+
+          const responseContent = response.choices[0].message.content;
+          if (responseContent === null) {
+            throw new Error("No content received from API");
+          }
+          content = responseContent;
+          
+          // Create completion object with usage information
+          const completion = {
+            choices: [{ message: { content: content } }],
+            usage: response.usage,
+            model: model
+          };
+
+          let endTime = Date.now();
+          completionTime = (endTime - startTime) / 1000;
+          chatLog += processMessage(completion, true);
+          if (speakingActive) {
+            speak(content);
+          }
           chatLock = false;
         } catch (error) {
           console.log(error);
@@ -151,10 +266,13 @@
         }
       }
       if (model[0] === "c") {
+        //claude API words differently
+        //a server must be made to handle this
+        //this is a placeholder for now
         //claude model called
         try {
           let startTime = Date.now();
-          completion = await anthropic.messages.create({
+          let completion = await anthropic.messages.create({
             model: "claude-3-opus-20240229",
             max_tokens: 1000,
             temperature: 0,
@@ -251,10 +369,12 @@
 <!--GPT model select-->
 <label>
   <select class="bg-base-100" bind:value={model}>
+    <option value="deepseek-reasoner">DeepSeek-R1</option>
+    <option value="deepseek-chat">DeepSeek-v3</option>
+    <option value="o1-preview">GPT o1-preview</option>
+    <option value="o1-mini">GPT o1-mini</option>
     <option value="gpt-4o">GPT-4o</option>
     <option value="gpt-4-turbo">GPT-4 Turbo</option>
-    <option value="claude-3-5-sonnet-20240620">Claude 3.5</option>
-    <option value="claude-3-opus-20240229">Claude 3</option>
   </select>
 </label>
 
