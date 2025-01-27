@@ -78,19 +78,14 @@
 
   function processMessage(input: any, isBot: boolean) {
     let messageContent = input;
-    let messageContent = input;
 
     if (isBot) {
-      messageContent = input.choices[0].message.content;
       messageContent = input.choices[0].message.content;
     }
 
     messageContent = markdownToHtml(messageContent);
 
-    messageContent = markdownToHtml(messageContent);
-
     if (isBot) {
-      addToHistory("assistant", messageContent);
       addToHistory("assistant", messageContent);
       outputTokens += input.usage.completion_tokens;
       inputTokens += input.usage.prompt_tokens;
@@ -102,44 +97,7 @@
           </div>
         </div>
       `;
-      return `
-        <div class='chat chat-start text-left flex flex-col space-y-0'>
-          <div class='chat-bubble'>${messageContent}</div>
-          <div class='text-[11px] italic'>
-            (Completion time: ${completionTime}; i:${input.usage.prompt_tokens} o:${input.usage.completion_tokens}; Model: ${input.model})
-          </div>
-        </div>
-      `;
     } else {
-      addToHistory("user", messageContent);
-      return `
-        <div class='chat chat-end'>
-          <div class='chat-bubble text-right'>${messageContent}</div>
-        </div>
-      `;
-    }
-  }
-
-  function markdownToHtml(markdown: string) {
-    marked.setOptions({
-      highlight: function (code: string, lang: string) {
-        return hljs.highlightAuto(code).value;
-      },
-    });
-    return marked(markdown);
-  }
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    const textarea = e.target as HTMLTextAreaElement; // Type assertion
-    if (!textarea) return;
-    e.preventDefault();
-    const startPosition = textarea.selectionStart;
-    const endPosition = textarea.selectionEnd;
-    input = input.slice(0, startPosition) + "\n" + input.slice(endPosition);
-    setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = startPosition + 1;
-    }, 0);
-  };
       addToHistory("user", messageContent);
       return `
         <div class='chat chat-end'>
@@ -347,51 +305,19 @@
   const handlePromptChange = () => {
     if (mode === "mimesis") {
       chatHistory = [];
-    if (mode === "mimesis") {
-      chatHistory = [];
       prompt =
-        "You are a chatbot named Mimesis. Try and come off personable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
-      addToHistory("system", prompt);
         "You are a chatbot named Mimesis. Try and come off personable rather than formal. Try and keep chats as conversational as possible. DO NOT USE LISTS. DO NOT MAKE A NUMBERED LIST UNLESS SPECIFICALLY ASKED.";
       addToHistory("system", prompt);
     }
     if (mode === "coding") {
       chatHistory = [];
-    if (mode === "coding") {
-      chatHistory = [];
       prompt =
-        "Your name is Mimesis and you are a coding assistant. Answer questions as succinctly as possible. Rely on code whenever possible. Assume the user has a good understanding of coding and refrain from unwarranted details if they may come off trivial or unnecessary. Keep linguistic responses as short as possible but do not be afraid to produce longform code.";
-      addToHistory("system", prompt);
         "Your name is Mimesis and you are a coding assistant. Answer questions as succinctly as possible. Rely on code whenever possible. Assume the user has a good understanding of coding and refrain from unwarranted details if they may come off trivial or unnecessary. Keep linguistic responses as short as possible but do not be afraid to produce longform code.";
       addToHistory("system", prompt);
     }
     if (mode === "custom") {
       prompt = "";
     }
-  };
-
-  function getVoices() {
-    voices = window.speechSynthesis.getVoices();
-    selectedVoice = voices.find(
-      (voice: any) => voice.name === "Google US English"
-    );
-    isSupported = !!selectedVoice;
-  }
-
-  function toggleSpeaking() {
-    speakingActive = !speakingActive;
-  }
-
-  const handleCustomPrompt = () => {
-    chatHistory = [];
-    addToHistory("system", prompt);
-  };
-
-  const clearChat = () => {
-    chatHistory = [];
-    chatLog = "";
-    outputTokens = 0;
-    inputTokens = 0;
   };
 
   function getVoices() {
@@ -440,27 +366,6 @@
   </button>
 </div>
 
-<div>
-  <button
-    on:click={() => {
-      clearChat();
-    }}
-  >
-    <p
-      class="font-logo font-bold text-[110px] tracking-[-8px] mt-[-20] mb-[-55px]"
-    >
-      {#if mode === "coding"}
-        Mimesis.code
-      {:else if mode === "custom"}
-        Mimesis.
-      {:else}
-        Mimesis.dev
-      {/if}
-    </p>
-    <p class="font-writing text-[20px] tracking-[20px] mb-12">chatbot</p>
-  </button>
-</div>
-
 <!--GPT model select-->
 <label>
   <select class="bg-base-100" bind:value={model}>
@@ -484,8 +389,6 @@
   >
     <option value="mimesis">Mimesis</option>
     <option value="coding">Mimesis Code</option>
-    <option value="mimesis">Mimesis</option>
-    <option value="coding">Mimesis Code</option>
     <option value="custom">Custom</option>
   </select>
 </label>
@@ -496,27 +399,9 @@
       bind:value={prompt}
       on:change={handleCustomPrompt}
     />
-    <textarea
-      placeholder="Leave empty to use no prompt"
-      bind:value={prompt}
-      on:change={handleCustomPrompt}
-    />
   </div>
 {/if}
 
-<div class="form-control">
-  <label class="label cursor-pointer">
-    <span class="label-text">Speak &nbsp;</span>
-    <input
-      type="checkbox"
-      class="checkbox"
-      on:change={toggleSpeaking}
-      checked={speakingActive}
-    />
-  </label>
-</div>
-
-<div class="h-96 p-6 w-full overflow-y-auto border rounded-lg g-c">
 <div class="form-control">
   <label class="label cursor-pointer">
     <span class="label-text">Speak &nbsp;</span>
@@ -542,7 +427,6 @@
       e.preventDefault();
       input += "\n";
     } else if (e.shiftKey && e.key === "Enter") {
-      handleKeyDown(e);
       handleKeyDown(e);
     } else if (e.key === "Enter") {
       e.preventDefault();
