@@ -6,7 +6,7 @@ This chatbot was built using Svelte and Tailwind. It uses DaisyUI as a component
 
 
 ## build the app: 
-Setup is extremely simpole. Add your API keys into the .env file where indicated, then run:
+Setup is extremely simple. Add your API keys into the .env file where indicated, then run:
 ```
 npm install
 npm run dev
